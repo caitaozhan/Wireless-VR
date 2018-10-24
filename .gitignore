@@ -1,0 +1,9 @@
+Assets/
+Bin/
+Obj/
+*.exe
+*.ico
+*.rc
+*.dll
+Projects/
+
