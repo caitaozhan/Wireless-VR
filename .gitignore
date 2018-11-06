@@ -1,9 +1,18 @@
-Assets/
-Bin/
-Obj/
-*.exe
-*.ico
-*.rc
-*.dll
-Projects/
+OculusWorldDemo/Assets/
+OculusWorldDemo/Bin/
+OculusWorldDemo/Obj/
+OculusWorldDemo/*.exe
+OculusWorldDemo/*.ico
+OculusWorldDemo/*.rc
+OculusWorldDemo/*.dll
+OculusWorldDemo/Projects/
 
+CommonSrc/Render/
+CommonSrc/Util/
+CommonSrc/Oculus.ico
+
+GuardianSystemDemo/
+OculusPerfStatsSample/
+OculusRoomTiny/
+OculusRoomTiny_Advanced/
+Projects/
