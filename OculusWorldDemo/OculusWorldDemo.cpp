@@ -3640,6 +3640,22 @@ void OculusWorldDemoApp::OnIdle()
     Profiler.RecordSample(RenderProfiler::Sample_AfterPresent);
 }
 
+/*
+	This is a function prints the Position of VR HMD (Head Mounted Display) as fast as possible to a file
+	A thread will call this function
+*/
+void OculusWorldDemoApp::MyPositionThread()
+{
+	// TODO
+	int i = 1;
+	while (true)
+	{
+		this_thread::sleep_for(chrono::milliseconds(500));
+		i++;
+	}
+}
+
+
 bool OculusWorldDemoApp::HandleOvrError(ovrResult error)
 {
     if (error < ovrSuccess)

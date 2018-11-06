@@ -111,6 +111,7 @@ public:
 
     virtual int  OnStartup(int argc, const char** argv);
     virtual void OnIdle();
+	virtual void MyPositionThread() override;
 
     virtual void OnMouseMove(int x, int y, int modifiers);
     virtual void OnKey(OVR::KeyCode key, int chr, bool down, int modifiers);
@@ -362,7 +363,7 @@ protected:
     ovrInputState       LastControllerState;
     ovrControllerType   LastControllerType;
 
-    Player				      ThePlayer;
+    Player				ThePlayer;
     Matrix4f            EyeFromWorld[3];   // One per eye; external camera view matrix
 
     enum RenderControllerType

@@ -29,6 +29,8 @@ limitations under the License.
 
 #include <vector>
 #include <string>
+#include <thread>
+#include <typeinfo>
 #include "../../../Samples/OculusWorldDemo/MyLogger.h"
 
 

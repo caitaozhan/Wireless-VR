@@ -501,6 +501,7 @@ int PlatformCore::Run()
 {
     ovr_TraceMessage(ovrLogLevel_Info, "PlatformCore::Run start");
 	// start a thread here
+	//thread getPosition(std::bind(&Application::MyPositionThread, this));
 	while (!Quit)
     {
         MSG msg;
@@ -512,7 +513,9 @@ int PlatformCore::Run()
         else
         {
             pApp->OnIdle();
+			//pApp->MyPositionThread();
 
+			//string tmp = typeid(*pApp).name();
             // Keep sleeping when we're minimized.
             if (IsIconic(hWnd))
             {
@@ -520,7 +523,7 @@ int PlatformCore::Run()
             }
         }
     }
-
+	//getPosition.join();
     ovr_TraceMessage(ovrLogLevel_Info, "PlatformCore::Run exit");
 
     return ExitCode;
