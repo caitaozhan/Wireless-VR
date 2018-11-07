@@ -111,7 +111,7 @@ public:
 
     virtual int  OnStartup(int argc, const char** argv);
     virtual void OnIdle();
-	virtual void MyPositionThread() override;
+	virtual float  GetPosition() override;
 
     virtual void OnMouseMove(int x, int y, int modifiers);
     virtual void OnKey(OVR::KeyCode key, int chr, bool down, int modifiers);

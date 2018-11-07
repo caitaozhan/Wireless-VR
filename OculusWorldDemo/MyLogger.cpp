@@ -21,3 +21,9 @@ void MyLogger::appendLog(int logmsg)
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	m_log << ms.count() << " " << logmsg << endl;
 }
+
+void MyLogger::appendLog(float logmsg)
+{
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	m_log << ms.count() << " " << logmsg << endl;
+}

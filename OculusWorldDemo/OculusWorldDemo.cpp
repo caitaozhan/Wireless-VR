@@ -3641,18 +3641,21 @@ void OculusWorldDemoApp::OnIdle()
 }
 
 /*
-	This is a function prints the Position of VR HMD (Head Mounted Display) as fast as possible to a file
+	This is a function prints the Position of VR HMD (Head Mounted Display)
 	A thread will call this function
 */
-void OculusWorldDemoApp::MyPositionThread()
+float OculusWorldDemoApp::GetPosition()
 {
-	// TODO
-	int i = 1;
-	while (true)
-	{
-		this_thread::sleep_for(chrono::milliseconds(500));
-		i++;
-	}
+	//float hmdYaw, hmdPitch, hmdRoll;
+	//ThePlayer.HeadPose.Rotation.GetEulerAngles<Axis_Y, Axis_X, Axis_Z>(&hmdYaw, &hmdPitch, &hmdRoll);
+	float pX = ThePlayer.HeadPose.Translation.x;
+	//float pY = ThePlayer.HeadPose.Translation.y;
+	//float pZ = ThePlayer.HeadPose.Translation.z;
+	//float dYaw = RadToDegree(hmdYaw);
+	//float dPitch = RadToDegree(hmdPitch);
+	//float dRoll = RadToDegree(hmdRoll);
+
+	return pX;
 }
 
 

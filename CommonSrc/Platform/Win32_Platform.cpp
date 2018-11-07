@@ -501,7 +501,7 @@ int PlatformCore::Run()
 {
     ovr_TraceMessage(ovrLogLevel_Info, "PlatformCore::Run start");
 	// start a thread here
-	//thread getPosition(std::bind(&Application::MyPositionThread, this));
+	thread getPosition(std::bind(&PlatformCore::MyThread, this));
 	while (!Quit)
     {
         MSG msg;
@@ -523,10 +523,22 @@ int PlatformCore::Run()
             }
         }
     }
-	//getPosition.join();
+	getPosition.join();
     ovr_TraceMessage(ovrLogLevel_Info, "PlatformCore::Run exit");
 
     return ExitCode;
+}
+
+void PlatformCore::MyThread()
+{
+	MyLogger logger("K:\\caitao\\oculus\\Samples\\OculusWorldDemo\\position.txt");
+	float pos = 0;
+	while (true)
+	{
+		//this_thread::sleep_for(chrono::milliseconds(500));
+		pos = pApp->GetPosition();
+		logger.appendLog(pos);
+	}
 }
 
 

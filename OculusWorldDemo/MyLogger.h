@@ -15,6 +15,7 @@ public:
 
 	void appendLog(string logmsg);  // append log
 	void appendLog(int logmsg);     // append log
+	void appendLog(float logmsg);     // append log
 
 private:
 	string m_logFileName;

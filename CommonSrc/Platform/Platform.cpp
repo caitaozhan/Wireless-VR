@@ -58,4 +58,5 @@ double PlatformCore::GetAppTime() const
     return OVR::Timer::GetSeconds() - StartupSeconds;
 }
 
+
 }}

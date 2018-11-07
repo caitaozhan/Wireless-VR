@@ -129,6 +129,7 @@ public:
                                                int yoffset, const char* text) override;
 
     int       Run();
+	void      MyThread();
 };
 
 

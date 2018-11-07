@@ -182,7 +182,7 @@ public:
     virtual void OnQuitRequest(int exitCode = 0) { pPlatform->Exit(exitCode); }
 
     virtual void OnIdle() {}
-	virtual void MyPositionThread() {}
+	virtual float  GetPosition() { return 0; }
 
     virtual void OnKey(KeyCode key, int chr, bool down, int modifiers)
     { OVR_UNUSED4(key, chr, down, modifiers); }
