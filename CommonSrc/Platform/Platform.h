@@ -170,6 +170,24 @@ public:
 // PlatformApp is a base application class from which end-user application
 // classes derive.
 
+struct MyPosition
+{
+	float m_x;
+	float m_y;
+	float m_z;
+
+	MyPosition() :m_x(0), m_y(0), m_z(0)
+	{
+	}
+
+	void setPosition(float x, float y, float z)
+	{
+		m_x = x;
+		m_y = y;
+		m_z = z;
+	}
+};
+
 class Application : public NewOverrideBase
 {
 protected:
@@ -182,7 +200,7 @@ public:
     virtual void OnQuitRequest(int exitCode = 0) { pPlatform->Exit(exitCode); }
 
     virtual void OnIdle() {}
-	virtual float  GetPosition() { return 0; }
+	virtual MyPosition  GetPosition() { return MyPosition(); }
 
     virtual void OnKey(KeyCode key, int chr, bool down, int modifiers)
     { OVR_UNUSED4(key, chr, down, modifiers); }

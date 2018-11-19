@@ -33,6 +33,11 @@ limitations under the License.
 #include "Kernel/OVR_Log.h"
 
 
+// The path to the gm data folder
+#define GM_DATA_PATH "K:\caitao\libgm-windows\libgm-windows\gm_data"
+
+
+
 // Use WaitFrame/BeginFrame/EndFrame in place of SubmitFrame
 #define USE_WAITFRAME 1
 
@@ -105,6 +110,8 @@ const bool OculusWorldDemoApp::UseDepth[OculusWorldDemoApp::Rendertarget_LAST] =
 // ***** OculusWorldDemoApp
 
 OculusWorldDemoApp::OculusWorldDemoApp() :
+	logger(),
+
     OVR_ExceptionHandler(),
     OVR_GUIExceptionListener(),
     OwdScript(this),
@@ -651,6 +658,11 @@ int OculusWorldDemoApp::OnStartup(int argc, const char** argv)
 
     int res = InitializeRendering(true);
 
+	bool gm_tracking_init = gm_tracking.init();
+	if (!gm_tracking_init) {
+		std::cerr << "Failed to init GM tracking" << std::endl;
+		exit(1);
+	}
 
     return res;
 }
@@ -2236,11 +2248,11 @@ void OculusWorldDemoApp::HandleHaptics()
     bool wasButtonPressed_A = ((LastInputState.Buttons & ovrButton_A) != 0);
     bool wasButtonPressed_X = ((LastInputState.Buttons & ovrButton_X) != 0);
     float handTrigger[] = {
-        std::max(0.0f, InputState.HandTrigger[0] - 0.02f),
-        std::max(0.0f, InputState.HandTrigger[1] - 0.02f) };
+        max(0.0f, InputState.HandTrigger[0] - 0.02f),
+        max(0.0f, InputState.HandTrigger[1] - 0.02f) };
     float lastHandTrigger[] = {
-        std::max(0.0f, LastInputState.HandTrigger[0] - 0.02f),
-        std::max(0.0f, LastInputState.HandTrigger[1] - 0.02f) };
+        max(0.0f, LastInputState.HandTrigger[0] - 0.02f),
+        max(0.0f, LastInputState.HandTrigger[1] - 0.02f) };
 
     // Touch X Button, changes haptics mode
     if (!wasButtonPressed_X && buttonPressed_X)
@@ -2276,7 +2288,7 @@ void OculusWorldDemoApp::HandleHaptics()
         case 2:
             if (handTrigger[t] == 0.0f)
                 continue;
-            amplitude = (uint8_t)std::min(255, (int32_t)round(handTrigger[t] * 255) + 8);
+            amplitude = (uint8_t)min(255, (int32_t)round(handTrigger[t] * 255) + 8);
 
             result = ovr_GetControllerVibrationState(Session, touchController[t], &state);
             if (result != ovrSuccess || state.SamplesQueued >= kLowLatencyBufferSizeInSamples)
@@ -2293,7 +2305,7 @@ void OculusWorldDemoApp::HandleHaptics()
         case 3:
             if (handTrigger[t] == 0.0f)
                 continue;
-            amplitude = (uint8_t)std::min(255, (int32_t)round(handTrigger[t] * 255) + 8);
+            amplitude = (uint8_t)min(255, (int32_t)round(handTrigger[t] * 255) + 8);
 
             result = ovr_GetControllerVibrationState(Session, touchController[t], &state);
             if (result != ovrSuccess)
@@ -3644,18 +3656,37 @@ void OculusWorldDemoApp::OnIdle()
 	This is a function prints the Position of VR HMD (Head Mounted Display)
 	A thread will call this function
 */
-float OculusWorldDemoApp::GetPosition()
+MyPosition OculusWorldDemoApp::GetPosition()
 {
-	//float hmdYaw, hmdPitch, hmdRoll;
-	//ThePlayer.HeadPose.Rotation.GetEulerAngles<Axis_Y, Axis_X, Axis_Z>(&hmdYaw, &hmdPitch, &hmdRoll);
-	float pX = ThePlayer.HeadPose.Translation.x;
-	//float pY = ThePlayer.HeadPose.Translation.y;
-	//float pZ = ThePlayer.HeadPose.Translation.z;
-	//float dYaw = RadToDegree(hmdYaw);
-	//float dPitch = RadToDegree(hmdPitch);
-	//float dRoll = RadToDegree(hmdRoll);
+	MyPosition mypos;
 
-	return pX;
+	// ThePlayer.HeadPose.Translation is a Vector3<float>
+	// ThePlayer.HeadPose.Rotation is a Quat<float>
+
+	float yaw, pitch, roll;
+	ThePlayer.HeadPose.Rotation.GetYawPitchRoll(&yaw, &pitch, &roll);
+
+	float pX = ThePlayer.HeadPose.Translation.x;
+	float pY = ThePlayer.HeadPose.Translation.y;
+	float pZ = ThePlayer.HeadPose.Translation.z;
+
+	float qX = ThePlayer.HeadPose.Rotation.x;
+	float qY = ThePlayer.HeadPose.Rotation.y;
+	float qZ = ThePlayer.HeadPose.Rotation.z;
+	float qW = ThePlayer.HeadPose.Rotation.w;
+
+	std::stringstream sstr;
+	sstr << "XYZ: " << pX << " " << pY << " " << pZ <<
+		    "\tqXYZW: " << qX << " " << qY << " " << qZ << " " << qW <<
+		    "\tYPR: " << yaw << " " << pitch << " " << roll;
+	logger.appendLog(sstr.str());
+	
+	gm_tracking.update(pX, pY, pZ,
+						qX, qY, qZ, qW,
+						yaw, pitch, roll);
+
+	mypos.setPosition(pX, pY, pZ);
+	return mypos;
 }
 
 

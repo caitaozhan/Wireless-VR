@@ -2,7 +2,10 @@
 
 
 MyLogger::MyLogger()
-{}
+{
+	m_logFileName = "logs/tmp.txt";
+	m_log.open(m_logFileName);
+}
 
 MyLogger::MyLogger(string logFileName)
 {

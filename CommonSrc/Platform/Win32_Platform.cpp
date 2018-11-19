@@ -513,7 +513,6 @@ int PlatformCore::Run()
         else
         {
             pApp->OnIdle();
-			//pApp->MyPositionThread();
 
 			//string tmp = typeid(*pApp).name();
             // Keep sleeping when we're minimized.
@@ -531,13 +530,13 @@ int PlatformCore::Run()
 
 void PlatformCore::MyThread()
 {
-	MyLogger logger("K:\\caitao\\oculus\\Samples\\OculusWorldDemo\\position.txt");
-	float pos = 0;
+	//MyLogger logger("K:\\caitao\\oculus\\Samples\\OculusWorldDemo\\position.txt");
+	MyPosition mypos;
 	while (true)
 	{
-		//this_thread::sleep_for(chrono::milliseconds(500));
-		pos = pApp->GetPosition();
-		logger.appendLog(pos);
+		//this_thread::sleep_for(chrono::milliseconds(1000));
+		mypos = pApp->GetPosition();
+		//logger.appendLog(mypos);
 	}
 }
 

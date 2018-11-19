@@ -25,6 +25,10 @@ limitations under the License.
 #ifndef OVR_OculusWorldDemo_h
 #define OVR_OculusWorldDemo_h
 
+#include "gm_tracking.h"
+
+#include "MyLogger.h"
+
 #include "Kernel/OVR_Types.h"
 #include "Kernel/OVR_Allocator.h"
 #include "Kernel/OVR_RefCount.h"
@@ -102,6 +106,12 @@ using namespace OVR::Render;
 
 class OculusWorldDemoApp : public Application
 {
+private:
+	// Custom member variables used for logging and the GM.
+	MyLogger logger;
+
+	GMTracking gm_tracking;
+
 protected:
     enum CamRenderPoseEnum;
 
@@ -111,7 +121,7 @@ public:
 
     virtual int  OnStartup(int argc, const char** argv);
     virtual void OnIdle();
-	virtual float  GetPosition() override;
+	virtual MyPosition  GetPosition() override;
 
     virtual void OnMouseMove(int x, int y, int modifiers);
     virtual void OnKey(OVR::KeyCode key, int chr, bool down, int modifiers);
