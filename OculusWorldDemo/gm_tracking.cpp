@@ -42,31 +42,35 @@ float determinant(float matrix[3][3]) {
 
 void GMTracking::update(float vr_x, float vr_y, float vr_z,
 						float vr_qx, float vr_qy, float vr_qz, float vr_qw,
-						float vr_yaw, float vr_pitch, float vr_roll) {
-	if (vr_x == 0.0 && vr_y == 0.0 && vr_z == 0.0) {
+						float vr_yaw, float vr_pitch, float vr_roll) 
+{
+	if (vr_x == 0.0 && vr_y == 0.0 && vr_z == 0.0) 
+	{
 		return;
 	}
 
-	if (!vr_init_pos_set) {
+	if (!vr_init_pos_set) 
+	{
 		vr_init_x = vr_x;
 		vr_init_y = vr_y;
 		vr_init_z = vr_z;
 		vr_init_pos_set = true;
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////
 	}
 
 	// TODO Find the receiver gm's new coordinates in the global system. For now just use the reported vr coordinates.
 	// Calculate misalignment matrix
-	double Matrix_Rot[3][3] = { {0.9499,-0.1682,-0.2636}, {0.1682,0.9855,-0.0227}, {0.2636,-0.0227,0.9644} };
+	//double Matrix_Rot[3][3] = { {0.9499,-0.1682,-0.2636}, {0.1682,0.9855,-0.0227}, {0.2636,-0.0227,0.9644} };
+	std::array<std::array<float, 3>, 3> rotationMatrix = computeRotationMatrix(vr_x, vr_y, vr_z);
 	// {0.9959,-0.0516,-0.0744}, {0.0516,0.9987,-0.0019}, {0.0744,-0.0019,0.9972}
 	double vr_delta_xyz[3] = { vr_x - vr_init_x, vr_y - vr_init_y, vr_z - vr_init_z };
 	double GM_delta[3] = { 0.0, 0.0, 0.0 };
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			GM_delta[i] += (Matrix_Rot[i][j] * vr_delta_xyz[j]);
+	for (int i = 0; i < 3; ++i) 
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			GM_delta[i] += (rotationMatrix[i][j] * vr_delta_xyz[j]);
 		}
 	}
 	double rx_x = GM_delta[0];
@@ -93,4 +97,70 @@ void GMTracking::update(float vr_x, float vr_y, float vr_z,
 
 	gm_h.set(init_gm_h + GM::degreeToGMUnit(h_angle));
 	gm_v.set(init_gm_v + GM::degreeToGMUnit(v_angle));
+}
+
+std::array<std::array<float, 3>, 3> GMTracking::computeRotationMatrix(float vr_x, float vr_y, float vr_z)
+{
+	std::array<float, 3> vect_GM = { -1.0, 0.0, 0.0 }; // GM moving vector
+	std::array<float, 3> VR_0    = { vr_x, vr_y, vr_z };  // Read VR position @t=0
+	printf(" Calibration began, please move the headset... ");
+	//usleep(5000);                        // give five sec for movement
+	// TODO: x, y, z are changing!
+	std::array<float, 3> VR_1 = { vr_x, vr_y, vr_z };  // read position after movement. // Read VR position @t=1
+	std::array<float, 3> vect_VR_nonNorm = { VR_1[0] - VR_0[0], VR_1[1] - VR_0[1], VR_1[2] - VR_0[2] }; // VR moving vector
+	// Now normalize VR vector
+	float deter = sqrt(pow(vect_VR_nonNorm[0], 2) + pow(vect_VR_nonNorm[1], 2) + pow(vect_VR_nonNorm[2], 2));
+	std::array<float, 3> vect_VR = { vect_VR_nonNorm[0] / deter, vect_VR_nonNorm[1] / deter, vect_VR_nonNorm[2] / deter }; // VR moving vector
+
+	float product = dotProduct(vect_VR, vect_GM);
+	std::array<float, 3> cross_P = crossProduct(vect_VR, vect_GM);
+
+	// initialize matrix and vectors
+	std::array<std::array<float, 3>, 3> rotm   = { { {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} } };
+	std::array<std::array<float, 3>, 3> skewM  = { { {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} } };
+	std::array<std::array<float, 3>, 3> skewM2 = { { {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0} } };
+	std::array<std::array<float, 3>, 3> I      = { { {1.0, 0.0, 0.0},{0.0, 1.0, 0.0},{0.0, 0.0, 1.0} } };
+	std::array<std::array<float, 3>, 3> skewM  = { { {0.0, -cross_P[2], cross_P[1]},{cross_P[2], 0.0, -cross_P[0]},{-cross_P[1], cross_P[0], 0.0} } }; //getting skew matrix
+
+	for (int i = 0; i < 3; ++i)  // getting squared skew matrix
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			for (int k = 0; k < 3; ++k)
+			{
+				skewM2[i][j] += skewM[i][k] * skewM[k][j];
+			}
+		}
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			rotm[i][j] = I[i][j] + skewM[i][j] + skewM2[i][j] / (product + 1);
+		}
+	}
+
+	return rotm;
+}
+
+float GMTracking::dotProduct(std::array<float, 3> vect_VR, std::array<float, 3> vect_GM)
+{
+	float product = 0;
+	for (int i = 0; i < 3; i++)   // Loop for calculate cot product
+	{
+		product = product + vect_VR[i] * vect_GM[i];
+	}
+	return product;
+}
+
+std::array<float, 3> GMTracking::crossProduct(std::array<float, 3> vect_VR, std::array<float, 3> vect_GM)
+{
+	std::array<float, 3> cross_P;
+
+	cross_P[0] = vect_VR[1] * vect_GM[2] - vect_VR[2] * vect_GM[1];
+	cross_P[1] = vect_VR[2] * vect_GM[0] - vect_VR[0] * vect_GM[2];
+	cross_P[2] = vect_VR[0] * vect_GM[1] - vect_VR[1] * vect_GM[0];
+
+	return cross_P;
 }
