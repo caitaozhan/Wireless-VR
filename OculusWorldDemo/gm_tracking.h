@@ -3,8 +3,10 @@
 #include "K:\caitao\libgm-windows\libgm-windows\gm.h"
 
 #include <vector>
+#include <array>
 
-class GMTracking {
+class GMTracking 
+{
 public:
 	GMTracking() {}
 	~GMTracking() {}
@@ -16,8 +18,11 @@ public:
 	void update(float vr_x, float vr_y, float vr_z,
 				float vr_qx, float vr_qy, float vr_qz, float vr_qw,
 				float vr_yaw, float vr_pitch, float vr_roll);
-
-	void computeMatrix();
+	
+	// Caitao: decide to use std:array instead of std::vector because array's dimension is fixed to 3 (always 3 elements)
+	std::array<std::array<float, 3>, 3> computeRotationMatrix(float vr_x, float vr_y, float vr_z);
+	std::array<float, 3>                crossProduct(std::array<float, 3> vect_VR, std::array<float, 3> vect_GM);
+	float                               dotProduct(std::array<float, 3> vect_VR, std::array<float, 3> vect_GM);
 
 private:
 	// TX GMs (labeled horizontal and vertical)
@@ -31,7 +36,7 @@ private:
 	float tx_gm_x, tx_gm_y, tx_gm_z;
 
 	// The first non-zero XYZ from the VR headset is treated as the initial position of the VR headset
-	bool vr_init_pos_set;
+	bool  vr_init_pos_set;
 	float vr_init_x, vr_init_y, vr_init_z;
 
 	// Let's us rotate from the VR coordinate system to the global frame of reference.
