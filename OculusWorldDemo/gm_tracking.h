@@ -21,12 +21,14 @@ public:
 
 private:
 	// TX GMs (labeled horizontal and vertical)
-	GM gm_h, gm_v;
+	GM tx_gm_h, tx_gm_v;
+	GM rx_gm_h, rx_gm_v;
 
-	int init_gm_h, init_gm_v;
+	int init_tx_gm_h, init_tx_gm_v;
+	int init_rx_gm_h, init_rx_gm_v;
 
 	// XYZ location of TX in global coordinates
-	float tx_x, tx_y, tx_z;
+	float tx_gm_x, tx_gm_y, tx_gm_z;
 
 	// The first non-zero XYZ from the VR headset is treated as the initial position of the VR headset
 	bool vr_init_pos_set;
